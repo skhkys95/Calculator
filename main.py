@@ -10,6 +10,8 @@ class MyApp(QWidget):
         self.initUI()
         self.state = "NO"
         self.pre_state = "NO"
+        self.op_state = "EQ"
+        self.pre_op_state = "EQ"
 
     def initUI(self):
         grid = QGridLayout()
@@ -71,9 +73,10 @@ class MyApp(QWidget):
         # Button event handle
         cancelButton.clicked.connect(self.cancel)
         equalButton.clicked.connect(self.result)
-        for i in range(10):
-            button = 'button_' + i
-            button.clicked.connect(self.buttoni)
+        button_0.clicked.connect(self.zero)
+        button_1.clicked.connect(self.number)
+        button_Point.clicked.connect(self.point)
+        button_Flipsign.clicked.connect(self.flipsign)
         button_Add.clicked.connect(self.Add)
         button_Sub.clicked.connect(self.Sub)
         button_Mul.clicked.connect(self.Mul)
@@ -83,6 +86,22 @@ class MyApp(QWidget):
         self.setWindowTitle('Calculator')
         self.setGeometry(1000, 200, 150, 300)
         self.show()
+
+    #"NO"에서 0을 누르면 계속 0이 나와야한다.
+    # 숫자 다음 0을 누르면 나와야한다.
+    # ".0" 포인트 다음 나오면 나와야한다.
+    def zero(self):
+        pass
+    # "NO"에서 숫자를 누르면 나와야한다.
+    def number(self):
+        pass
+
+    def point(self):
+        pass
+
+    def flipsign(self):
+        pass
+
 
     def cancel(self):
         pass
@@ -101,6 +120,46 @@ class MyApp(QWidget):
 
     def Div(self):
         pass
+
+    def Operation(self):
+        # pre_state 는 지금 가지고 있는 state값을 넣어주고
+        self.pre_state = self.state
+        # 이 함수에서는 'OP' state를 가져가도록
+        self.state = "OP"
+
+        # 지금 가지고 있는 OP_state확인
+
+        # 첫번째 계산에서는 그냥 무슨 연산인지만 저장하고 FN을 val1에 저장
+        if self.pre_state == "FN":
+            self.val1 = self.lineEdit.text()
+            # 여기서 op_state가 아니라 누른 버튼이 +인지 -인지를 구분해내서 그거를 저장해둬야함
+            # 연산 버튼을 눌렸을 때 그것이 + 인지 - 인지 알아내는걸 어떻게 해야하지..?
+            if self.op_state == "ADD":
+                self.op_state == "ADD"
+            elif self.op_state == "SUB":
+                self.op_state == "SUB"
+            elif self.op_state =="MUL":
+                self.op_state == "MUL"
+            elif self.op_state == "DIV":
+                self.op_state == "DIV"
+            elif self.op_state == "EQ":
+                self.op_state == "EQ"
+        # 두번째 계산이면 앞의 op_state에 따라서 계산을 해주고 나갈때는 또 지금 op_state를 넣어두면 됨
+        elif self.pre_state == "SN":
+            self.val2 = self.lineEdit.text()
+            if self.op_state == "ADD":
+                self.val2 = self.val1 + self.val2
+            elif self.op_state == "SUB":
+                self.val2 = self.val1 - self.val2
+            elif self.op_state =="MUL":
+                self.val2 = self.val1 * self.val2
+            elif self.op_state == "DIV":
+                self.val2 = self.val1 / self.val2
+            #op_state 1차를 계산해서 결과값을 돌려주고, 2차 op를 눌린거니까 그 2차 op를 저장해둬
+
+
+            self.lineEdit.setText(self.val2)
+
 
     def make_num_button(self):
 
