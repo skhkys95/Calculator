@@ -101,14 +101,15 @@ class MyApp(QWidget):
         self.setWindowTitle('Calculator')
         self.setGeometry(1000, 200, 150, 300)
         self.show()
-
-    def convert_int_or_float(testnum):
+    # 5.000을 int로 인식하는 함수로 발전시켜야함
+    def convert_int_or_float(self, testnum):
         if "." not in testnum:
             testnum = int(testnum)
         else:
             testnum = float(testnum)
+        return testnum
 
-    # def check_int_or_float(num):
+    # def convert_int_or_float(num):
     #     for i in num:
     #         if i =='.':
     #             posi_float = num[i:]
@@ -123,10 +124,6 @@ class MyApp(QWidget):
     #         else:
     #             num = int(num)
     #             print(type(num))
-    #
-    #
-    # print(check_int_or_float('6.005'))
-    # print(check_int_or_float('5.0000'))
 
     # NO에서 누르면 '.0'이 되어야함 (상태 FN)-> 0-9 누르면 FN , op나 '.'을 눌려도 그대로 유지
     # '.'이 앞에 있으면 다시 못누르게 해야함
@@ -222,11 +219,18 @@ class MyApp(QWidget):
 
 
     def flipsign(self):
-        pass
-
+        flip_num = self.line_edit.text()
+        flip_num = self.convert_int_or_float(flip_num)
+        flip_num = flip_num * (-1)
+        self.line_edit.setText(str(flip_num))
 
     def cancel(self):
-        pass
+        self.state = "NO"
+        self.pre_state = "NO"
+        self.exe_op = "EQ"
+        self.plan_op = "EQ"
+        self.line_edit.setText('0')
+
 
     def result(self):
         self.Operation("NO_OP")
@@ -263,11 +267,15 @@ class MyApp(QWidget):
         # 첫번째 계산에서는 그냥 무슨 연산인지만 저장하고 FN을 val1에 저장
         if self.pre_state == "FN":
             self.val1 = self.line_edit.text()
+            self.val1 = self.convert_int_or_float(self.val1)
+
             # 여기서 op_state가 아니라 누른 버튼이 +인지 -인지를 구분해내서 그거를 저장해둬야함
             # 연산 버튼을 눌렸을 때 그것이 + 인지 - 인지 알아내는걸 어떻게 해야하지..
         # 두번째 계산이면 앞의 op_state에 따라서 계산을 해주고 나갈때는 또 지금 op_state를 넣어두면 됨
         elif self.pre_state == "SN":
             self.val2 = self.line_edit.text()
+            self.val2 = self.convert_int_or_float(self.val2)
+
             if self.exe_op == "ADD":
                 self.val1 = self.val1 + self.val2
             elif self.exe_op == "SUB":
@@ -276,13 +284,12 @@ class MyApp(QWidget):
                 self.val1 = self.val1 * self.val2
             elif self.exe_op == "DIV":
                 self.val1 = self.val1 / self.val2
-
             # '='을 누를때는 어떻게 작동?
-            #elif self.exe_op == "NO_OP":
+            elif self.exe_op == "NO_OP":
+                self.val1 = self.val2
 
             #op_state 1차를 계산해서 결과값을 돌려주고, 2차 op를 눌린거니까 그 2차 op를 저장해둬
-            self.val1 = self.convert_int_or_float(self.val1)
-            self.line_edit.setText(self.val1)
+            self.line_edit.setText(str(self.val1))
         self.debug()
 
 
