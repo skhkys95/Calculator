@@ -41,15 +41,15 @@ class MyApp(QWidget):
         button_9 = QPushButton('9')
         button_0 = QPushButton('0')
 
-        button_Add = QPushButton('+')
-        button_Sub = QPushButton('-')
-        button_Mul = QPushButton('X')
-        button_Div = QPushButton('/')
+        self.button_Add = QPushButton('+')
+        self.button_Sub = QPushButton('-')
+        self.button_Mul = QPushButton('X')
+        self.button_Div = QPushButton('/')
 
-        button_Point = QPushButton('.')
-        button_Flipsign = QPushButton('+/-')
+        self.button_Point = QPushButton('.')
+        self.button_Flipsign = QPushButton('+/-')
 
-        button_list = [self.line_edit, cancelButton, equalButton, button_1, button_2, button_3, button_4, button_5,button_6,button_7,button_8,button_9,button_0,button_Add,button_Sub,button_Div,button_Mul,button_Point,button_Flipsign]
+        button_list = [self.line_edit, cancelButton, equalButton, button_1, button_2, button_3, button_4, button_5,button_6,button_7,button_8,button_9,button_0,self.button_Add,self.button_Sub,self.button_Div,self.button_Mul,self.button_Point,self.button_Flipsign]
         for i in button_list:
             i.setMaximumHeight(40)
         # 버튼 배치
@@ -68,13 +68,13 @@ class MyApp(QWidget):
         grid.addWidget(button_9,2,2,1,1)
         grid.addWidget(button_0,5,1,1,1)
 
-        grid.addWidget(button_Add,4,3,1,1)
-        grid.addWidget(button_Sub,5,3,1,1)
-        grid.addWidget(button_Mul,3,3,1,1)
-        grid.addWidget(button_Div,2,3,1,1)
+        grid.addWidget(self.button_Add,4,3,1,1)
+        grid.addWidget(self.button_Sub,5,3,1,1)
+        grid.addWidget(self.button_Mul,3,3,1,1)
+        grid.addWidget(self.button_Div,2,3,1,1)
 
-        grid.addWidget(button_Point,5,2,1,1)
-        grid.addWidget(button_Flipsign,5,0,1,1)
+        grid.addWidget(self.button_Point,5,2,1,1)
+        grid.addWidget(self.button_Flipsign,5,0,1,1)
 
         # Button event handle
         cancelButton.clicked.connect(self.cancel)
@@ -90,17 +90,19 @@ class MyApp(QWidget):
         button_8.clicked.connect(self.eight)
         button_9.clicked.connect(self.nine)
 
-        button_Point.clicked.connect(self.point)
-        button_Flipsign.clicked.connect(self.flipsign)
-        button_Add.clicked.connect(self.Add)
-        button_Sub.clicked.connect(self.Sub)
-        button_Mul.clicked.connect(self.Mul)
-        button_Div.clicked.connect(self.Div)
+        self.button_Point.clicked.connect(self.point)
+        self.button_Flipsign.clicked.connect(self.flipsign)
+        self.button_Add.clicked.connect(self.Add)
+        self.button_Sub.clicked.connect(self.Sub)
+        self.button_Mul.clicked.connect(self.Mul)
+        self.button_Div.clicked.connect(self.Div)
 
         # 창 만들기
         self.setWindowTitle('Calculator')
         self.setGeometry(1000, 200, 150, 300)
         self.show()
+
+
     # 5.000을 int로 인식하는 함수로 발전시켜야함
     def convert_int_or_float(self, testnum):
         if "." not in testnum:
@@ -163,6 +165,7 @@ class MyApp(QWidget):
     # 숫자 다음 0을 누르면 나와야한다.
     # ".0" 포인트 다음 나오면 나와야한다.
     def zero(self):
+        self.setEnable_button(True)
         # pre_state 는 지금 가지고 있는 state값을 넣어주고
         self.pre_state = self.state
         lineEdit_num = self.line_edit.text()
@@ -175,8 +178,12 @@ class MyApp(QWidget):
             self.line_edit.setText("0")
             self.state = "SN"
         elif self.pre_state =="SN":
-            self.line_edit.setText(lineEdit_num + "0")
+            if lineEdit_num == '0':
+                self.line_edit.setText('0')
+            else:
+                self.line_edit.setText(lineEdit_num + "0")
             self.state = "SN"
+        self.debug()
 
     def one(self):
         self.number('1')
@@ -199,24 +206,26 @@ class MyApp(QWidget):
 
     # "NO"에서 숫자를 누르면 나와야한다.
     def number(self, num):
+        self.setEnable_button(True)
         # pre_state 는 지금 가지고 있는 state값을 넣어주고
         self.pre_state = self.state
+        lineEdit_num = self.line_edit.text()
         if self.pre_state == "NO":
             self.line_edit.setText(num)
             self.state = "FN"
         elif self.pre_state == "FN":
-            lineEdit_num = self.line_edit.text()
             self.line_edit.setText(lineEdit_num + num)
             self.state = "FN"
         elif self.pre_state == "OP":
             self.line_edit.setText(num)
             self.state = "SN"
         elif self.pre_state == "SN":
-            lineEdit_num = self.line_edit.text()
-            self.line_edit.setText(lineEdit_num + num)
+            if lineEdit_num == '0':
+                self.line_edit.setText('0')
+            else:
+                self.line_edit.setText(lineEdit_num + num)
             self.state = "SN"
         self.debug()
-
 
     def flipsign(self):
         flip_num = self.line_edit.text()
@@ -231,25 +240,29 @@ class MyApp(QWidget):
         self.plan_op = "EQ"
         self.line_edit.setText('0')
 
-
     def result(self):
         self.Operation("NO_OP")
 
     def Add(self):
         self.Operation("ADD")
 
-
     def Sub(self):
         self.Operation("SUB")
-
 
     def Mul(self):
         self.Operation("MUL")
 
-
     def Div(self):
         self.Operation("DIV")
 
+    # 0으로 나눌 수 없습니다 라는 문구가 뜨면서 setenable 되는 버튼 모으기
+    def setEnable_button(self, bool):
+        self.button_Add.setEnabled(bool)
+        self.button_Sub.setEnabled(bool)
+        self.button_Mul.setEnabled(bool)
+        self.button_Div.setEnabled(bool)
+        self.button_Point.setEnabled(bool)
+        self. button_Flipsign.setEnabled(bool)
 
     def Operation(self, op_type):
         # pre_state 는 지금 가지고 있는 state값을 넣어주고
@@ -259,10 +272,6 @@ class MyApp(QWidget):
 
         self.exe_op = self.plan_op
         self.plan_op = op_type
-
-        # 지금 가지고 있는 op_type확인
-        #if op_type == "ADD":
-
 
         # 첫번째 계산에서는 그냥 무슨 연산인지만 저장하고 FN을 val1에 저장
         if self.pre_state == "FN":
@@ -283,15 +292,22 @@ class MyApp(QWidget):
             elif self.exe_op == "MUL":
                 self.val1 = self.val1 * self.val2
             elif self.exe_op == "DIV":
-                self.val1 = self.val1 / self.val2
-            # '='을 누를때는 어떻게 작동?
+                try:
+                    self.val1 = self.val1 / self.val2
+                except:
+                    self.setEnable_button(False)
+                    return self.line_edit.setText("0으로 나눌 수 없습니다")
+            # '='을 누를 때는 어떻게 작동?
             elif self.exe_op == "NO_OP":
                 self.val1 = self.val2
 
+            if str(self.val1)[-2:] == ".0":
+                self.val1 = str(self.val1)[:-2]
+            else:
+                self.val1 = round(self.val1, 10)
             #op_state 1차를 계산해서 결과값을 돌려주고, 2차 op를 눌린거니까 그 2차 op를 저장해둬
-            self.line_edit.setText(str(self.val1))
+        self.line_edit.setText(str(self.val1))
         self.debug()
-
 
 
 
