@@ -10,13 +10,13 @@ class MyApp(QWidget):
     def __init__(self):
         super().__init__()
         self.initUI()
-        self.state = "NO"
-        self.pre_state = "NO"
-        self.exe_op = "NO_OP"
-        self.plan_op = "NO_OP"
+        self.state_curr = "NO"
+        self.state_pre = "NO"
+        self.op_exec = "NO_OP"
+        self.op_plan = "NO_OP"
     def debug(self):
-        print("pre_state: " + self.pre_state + "  state: " + self.state)
-        print("exe_op: " + self.exe_op + "  plan_op: " + self.plan_op)
+        print("state_pre: " + self.state_pre + "  state_curr: " + self.state_curr)
+        print("op_exec: " + self.op_exec + "  op_plan: " + self.op_plan)
         print()
 
     def initUI(self):
@@ -49,7 +49,7 @@ class MyApp(QWidget):
         self.button_Point = QPushButton('.')
         self.button_Flipsign = QPushButton('+/-')
 
-        button_list = [self.line_edit, cancelButton, equalButton, button_1, button_2, button_3, button_4, button_5,button_6,button_7,button_8,button_9,button_0,self.button_Add,self.button_Sub,self.button_Div,self.button_Mul,self.button_Point,self.button_Flipsign]
+        button_list = [self.line_edit, cancelButton, equalButton, button_1, button_2, button_3, button_4, button_5, button_6,button_7,button_8,button_9,button_0,self.button_Add,self.button_Sub,self.button_Div,self.button_Mul,self.button_Point,self.button_Flipsign]
         for i in button_list:
             i.setMaximumHeight(40)
         # 버튼 배치
@@ -115,30 +115,30 @@ class MyApp(QWidget):
     # '.'이 앞에 있으면 다시 못누르게 해야함
     def point(self):
         # pre_state 는 지금 가지고 있는 state값을 넣어주고
-        self.pre_state = self.state
+        self.state_pre = self.state_curr
         # 처음 상태에서 '.'을 누를 경우
-        if self.pre_state == "NO":
+        if self.state_pre == "NO":
             #self.lineEdit.setText("0.") 둘다 가능
             lineEdit_num = self.line_edit.text()
             self.line_edit.setText(lineEdit_num + ".")
-            self.state = "FN"
+            self.state_curr = "FN"
         # 다른 숫자를 누르다가 '.'을 누르는 경우
-        elif self.pre_state == "FN":
+        elif self.state_pre == "FN":
             lineEdit_num = self.line_edit.text()
 
             if "." not in lineEdit_num:
                 self.line_edit.setText(lineEdit_num + ".")
                 # 굳이 현재 state를 FN으로 바꿔 줘야하나? 이미 FN이기 때문에.. 음..
                 # self.state ="FN"
-            # else구문이 필요한가요? lineEdit_num 에 이미 . 이 있을 경우 .을 찍으면 안되기 때문에 아무작동 안함
-            # else:
-            #     return
+                # else구문이 필요한가요? lineEdit_num 에 이미 . 이 있을 경우 .을 찍으면 안되기 때문에 아무작동 안함
+                # else:
+                #     return
         #새로운 계산을 할때 바로 '.'을 누르는 경우
-        elif self.pre_state == "OP":
+        elif self.state_pre == "OP":
             self.line_edit.setText("0.")
-            self.state = "SN"
+            self.state_curr = "SN"
         # 두번쨰 숫자를 누르던 중 '.'을 누르는 경우
-        elif self.pre_state == "SN":
+        elif self.state_pre == "SN":
             lineEdit_num = self.line_edit.text()
             if "." not in lineEdit_num:
                 self.line_edit.setText(lineEdit_num + ".")
@@ -152,25 +152,25 @@ class MyApp(QWidget):
     def zero(self):
         self.setEnable_button(True)
         # pre_state 는 지금 가지고 있는 state값을 넣어주고
-        self.pre_state = self.state
+        self.state_pre = self.state_curr
         lineEdit_num = self.line_edit.text()
 
         # pre_state가 NO 일때도 필요한가? NO일때는 0을 눌려도 아무작동 일어나지 않음
-        if self.pre_state == "FN":
+        if self.state_pre == "FN":
             self.line_edit.setText(lineEdit_num + "0")
-            self.state = "FN"
-        elif self.pre_state == "OP":
+            self.state_curr = "FN"
+        elif self.state_pre == "OP":
             self.line_edit.setText("0")
-            self.state = "SN"
-            if self.plan_op == "EQ":
+            self.state_curr = "SN"
+            if self.op_plan == "EQ":
                 self.line_edit.setText("0")
-                self.state = "FN"
-        elif self.pre_state == "SN":
+                self.state_curr = "FN"
+        elif self.state_pre == "SN":
             if lineEdit_num == '0':
                 self.line_edit.setText('0')
             else:
                 self.line_edit.setText(lineEdit_num + "0")
-            self.state = "SN"
+            self.state_curr = "SN"
         self.debug()
 
     def one(self):
@@ -196,25 +196,25 @@ class MyApp(QWidget):
     def number(self, num):
         self.setEnable_button(True)
         # pre_state 는 지금 가지고 있는 state값을 넣어주고
-        self.pre_state = self.state
+        self.state_pre = self.state_curr
         lineEdit_num = self.line_edit.text()
-        if self.pre_state == "NO":
+        if self.state_pre == "NO":
             self.line_edit.setText(num)
-            self.state = "FN"
-        elif self.pre_state == "FN":
+            self.state_curr = "FN"
+        elif self.state_pre == "FN":
             self.line_edit.setText(lineEdit_num + num)
-            self.state = "FN"
-        elif self.pre_state == "OP":
+            self.state_curr = "FN"
+        elif self.state_pre == "OP":
             self.line_edit.setText(num)
-            self.state = "SN"
-            if self.plan_op == "EQ":
-                self.state = "FN"
-        elif self.pre_state == "SN":
+            self.state_curr = "SN"
+            if self.op_plan == "EQ":
+                self.state_curr = "FN"
+        elif self.state_pre == "SN":
             if lineEdit_num == '0':
                 self.line_edit.setText('0')
             else:
                 self.line_edit.setText(lineEdit_num + num)
-            self.state = "SN"
+            self.state_curr = "SN"
         self.debug()
 
     def flipsign(self):
@@ -229,11 +229,10 @@ class MyApp(QWidget):
         self.force_init_state()
 
     def force_init_state(self):
-        self.state = "NO"
-        self.pre_state = "NO"
-        self.exe_op = "NO_OP"
-        self.plan_op = "NO_OP"
-
+        self.state_curr = "NO"
+        self.state_pre = "NO"
+        self.op_exec = "NO_OP"
+        self.op_plan = "NO_OP"
 
     def result(self):
         self.Operation("EQ")
@@ -262,33 +261,33 @@ class MyApp(QWidget):
     def Operation(self, op_type):
         self.setEnable_button(True)
         # pre_state 는 지금 가지고 있는 state값을 넣어주고
-        self.pre_state = self.state
+        self.state_pre = self.state_curr
         # 이 함수에서는 'OP' state를 가져가도록
-        self.state = "OP"
+        self.state_curr = "OP"
 
         # State와 별도로 op_state를 관리
-        self.exe_op = self.plan_op
-        self.plan_op = op_type
+        self.op_exec = self.op_plan
+        self.op_plan = op_type
 
         # 첫번째 계산에서는 그냥 무슨 연산인지만 저장하고 FN을 val1에 저장
-        if self.pre_state == "FN":
+        if self.state_pre == "FN":
             self.val1 = self.line_edit.text()
             self.val1 = self.convert_int_or_float(self.val1)
 
         # 여기서 op_state가 아니라 누른 버튼이 +인지 -인지를 구분해내서 그거를 저장해둬야함
         # 연산 버튼을 눌렸을 때 그것이 + 인지 - 인지 알아내는걸 어떻게 해야하지..
         # 두번째 계산이면 앞의 op_state에 따라서 계산을 해주고 나갈때는 또 지금 op_state를 넣어두면 됨
-        elif self.pre_state == "SN":
+        elif self.state_pre == "SN":
             self.val2 = self.line_edit.text()
             self.val2 = self.convert_int_or_float(self.val2)
 
-            if self.exe_op == "ADD":
+            if self.op_exec == "ADD":
                 self.val1 = self.val1 + self.val2
-            elif self.exe_op == "SUB":
+            elif self.op_exec == "SUB":
                 self.val1 = self.val1 - self.val2
-            elif self.exe_op == "MUL":
+            elif self.op_exec == "MUL":
                 self.val1 = self.val1 * self.val2
-            elif self.exe_op == "DIV":
+            elif self.op_exec == "DIV":
                 try:
                     self.val1 = self.val1 / self.val2
                 except:
@@ -296,7 +295,7 @@ class MyApp(QWidget):
                     self.force_init_state()
                     return self.line_edit.setText("0으로 나눌 수 없습니다")
             # '='을 누를 때는 어떻게 작동?
-            elif self.exe_op == "EQ":
+            elif self.op_exec == "EQ":
                 self.val1 = self.val2
 
             if str(self.val1)[-2:] == ".0":
@@ -304,8 +303,8 @@ class MyApp(QWidget):
             else:
                 self.val1 = round(self.val1, 10)
         # pre_state가 op이면서 plan_op가 EQ일 경우
-        elif self.pre_state == "OP":
-            if self.plan_op == "EQ:":
+        elif self.state_pre == "OP":
+            if self.op_plan == "EQ":
                 self.val1 = self.line_edit.text()
                 self.val1 = self.convert_int_or_float(self.val1)
         #else의 경우 0으로 DIV하고 나서 '0으로 나눌수없습니다'라고 예외처리를 하고 다시 '='을 눌렸을때 들어옴
